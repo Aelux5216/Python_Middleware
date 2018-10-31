@@ -4,8 +4,7 @@ import socket
 import sys
 import socket
 from datetime import datetime, date, time
-from suds.client import Client
-from suds.wsse import UsernameToken
+from nredarwin.webservice import DarwinLdbSession
 
 #Connect to the database
 
@@ -50,14 +49,29 @@ from suds.wsse import UsernameToken
 #server = Server('0.0.0.0', 8000) #Create new instance of server, 0.0.0.0 means it will host on any port so both 127.0.0.1(local pc only) and 192.168.1.1 will be hosted so it can be accessed from other pcs.
 #print("listening..") #State that the server is listening again. 
 
-token = UsernameToken("jstanford","***REMOVED***")
+def initSession():
+    newSession = DarwinLdbSession(wsdl="https://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2017-10-01", api_key="***REMOVED***")
+    return newSession
 
-client = Client("https://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2017-10-01")
+session = initSession()
 
-print(client)
+##Class creation##
 
-#r = client.service.GetArrivalBoard(1,"ABW", None, None, None, None)
+#class GetDepartureBoard:
+    #def __init__(board, boardName):
+        #board.boardName = boardName
+        
+inputBoard = str(input("Please enter the name of the departure board you would like and press enter: "))
 
-#print(r)
+boardRequest = session.get_station_board(inputBoard)
+
+arrStations = []
+
+print("Trains go from here to: \n")
+
+for a in boardRequest.train_services:
+    arrStations.append(a.destination_text)
+
+print(",".join(arrStations))
     
 #asyncore.loop() #Call loop method of asyncore to begin listening for clients again.
