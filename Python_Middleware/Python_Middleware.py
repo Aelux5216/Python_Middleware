@@ -35,6 +35,8 @@ class Handle_Data(asyncore.dispatcher_with_send):
                 
             formatted = "{".join(arrStations)
 
+            print(formatted)
+
             self.send(formatted.encode())
 
         if data2: #If there is any data run a command.
