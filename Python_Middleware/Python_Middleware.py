@@ -3,7 +3,7 @@ import asyncore #Import modules
 import socket
 import sys
 import socket
-from datetime import datetime, date, time
+import copy
 from nredarwin.webservice import DarwinLdbSession
 
 #Connect to API
@@ -28,6 +28,7 @@ class Handle_Data(asyncore.dispatcher_with_send):
             station = data3[1]
 
             boardRequest = session.get_station_board(station)
+
             arrStations = []
 
             for a in boardRequest.train_services:
@@ -72,10 +73,58 @@ print("listening..") #State that the server is listening again.
 
 ##Class creation##
 
-#class GetDepartureBoard:
-    #def __init__(board, boardName):
-        #board.boardName = boardName
+class Service:
+    def __init__(self, service_no, dep_code, arr_code):
         
+        session = initSession()
 
-    
+        depBoardRequest = session.get_station_board(dep_code,destination_crs=arr_code)
+        service = depBoardRequest.train_services[service_no]
+        
+        depServiceDet = session.get_service_details(depService_id)
+        arrDestPoints = depServiceDet.subsequent_calling_points
+        arrDest = arrDestPoints[len(arrDestPoints) - 1]
+
+        arrBoardRequest = session.get_station_board(arr_code,origin_crs=dep_code,include_departures=False, include_arrivals=True)
+
+        for a in depBoardRequest.train_services:
+            if depService_id in a.service_id:
+                arr_Platform = a.platform
+            pass
+
+        self.service_id = service.service_id
+        self.operator = service.operator_name
+        self.dep_name = service.origin_text
+        self.dep_code = dep_code
+        self.dep_time = service.std
+        self.dep_platform = service.platform
+        self.arr_name = service.destination_text
+        self.arr_code = arr_code
+        self.arr_time = arrDest.st
+        self.arr_platform = arr_platform
+        self.status = service.etd
+        self.disrupt_reason = depServiceDet.disruption_reason
+        self.calls_at 
+        self.stops = calls_at.count()
+
+        for b in arrDestPoints:
+            p1 = Calling_Points(b.location_name,b.crs,b.st,et)
+            self.calls_at.append(copy.copy(p1))
+            p1.reset()
+
+class Calling_Points:
+    def __init__(self, name, code, time, status):
+        
+        self.name = name
+        self.code = code
+        self.time = time
+        self.status = status
+
+class Tickets:
+    def __init__(self, reference, ticket_type, cost):
+
+        self.reference = reference
+        self.ticket_type = ticket_type
+        self.cost = cost
+
 asyncore.loop() #Call loop method of asyncore to begin listening for clients again.
