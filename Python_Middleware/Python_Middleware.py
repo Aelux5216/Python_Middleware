@@ -29,8 +29,6 @@ class Service:
                 arrDest = e
             pass
 
-        arrBoardRequest = session.get_station_board(arr_code,origin_crs=dep_code,include_departures=False, include_arrivals=True)
-
         for a in depBoardRequest.train_services:
             if depServiceId in a.service_id:
                 arr_platform = a.platform
