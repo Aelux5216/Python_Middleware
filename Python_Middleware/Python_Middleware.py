@@ -2,8 +2,8 @@
 import asyncore #Import modules
 import socket
 import sys
-import socket
 import copy
+import json
 from nredarwin.webservice import DarwinLdbSession
 
 #Connect to API
@@ -46,13 +46,13 @@ class Service:
         self.arr_platform = arr_platform
         self.status = service.etd
         self.disrupt_reason = depServiceDet.disruption_reason 
-        self.calls_at = []
+        #self.calls_at = []
 
-        for b in arrDestPoints:
-            p1 = Calling_Points(b.location_name,b.crs,b.st,b.et)
-            self.calls_at.append(copy.copy(p1))
+        #for b in arrDestPoints:
+            #p1 = Calling_Points(b.location_name,b.crs,b.st,b.et)
+            #self.calls_at.append(copy.copy(p1))
 
-        self.stops = len(self.calls_at)
+        #self.stops = len(self.calls_at)
 
 class Calling_Points:
     def __init__(self, name, code, time, status):
@@ -74,30 +74,28 @@ class Tickets:
 class Handle_Data(asyncore.dispatcher_with_send):
 
     def handle_read(self):
-        data = self.recv(1024) #Recieve data from the client.
+        rawData = self.recv(1024) #Recieve data from the client.
 
-        data2 = data.decode('ascii') #Decode the data recieved from ascii(since it was sent from c# code it will be in ascii).
+        decodedData = rawData.decode('ascii') #Decode the data recieved from ascii(since it was sent from c# code it will be in ascii).
 
-        if "test" in data2:
+        if "test" in decodedData:
 
             session = initSession()
 
-            data3 = data2.split("{")
+            splitData = decodedData.split("{")
 
-            station = data3[1]
+            serviceNo = int(splitData[1])
+            
+            depStation = splitData[2]
 
-            boardRequest = session.get_station_board(station)
+            arrStation = splitData[3]
 
-            arrStations = []
+            #Will use selected value service for service no, for now defaulting to first service index of 0
+            result = Service(serviceNo,depStation,arrStation)
 
-            for a in boardRequest.train_services:
-                arrStations.append(a.destination_text)
-                
-            formatted = "{".join(arrStations) #Use this to format station calling points later.
+            jsonObject = json.dumps(vars(result))
 
-            print(formatted)
-
-            self.send(formatted.encode())
+            self.send(jsonObject.encode())
 
         if data2: #If there is any data run a command.
                 if data2 == "REQUEST NAME":
@@ -129,10 +127,5 @@ class Server(asyncore.dispatcher):
 
 server = Server('0.0.0.0', 8000) #Create new instance of server, 0.0.0.0 means it will host on any port so both 127.0.0.1(local pc only) and 192.168.1.1 will be hosted so it can be accessed from other pcs.
 print("listening..") #State that the server is listening again. 
-
-indep = input("(crs code)Departing from?")
-indest = input("(crs code)Going to?")
-#Will use selected value service for service no, for now defaulting to first service index of 0
-service1 = Service(0,indep,indest)
 
 asyncore.loop() #Call loop method of asyncore to begin listening for clients again.
