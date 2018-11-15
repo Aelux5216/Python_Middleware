@@ -46,13 +46,15 @@ class Service:
         self.arr_platform = arr_platform
         self.status = service.etd
         self.disrupt_reason = depServiceDet.disruption_reason 
-        #self.calls_at = []
+        self.calls_at = []
 
-        #for b in arrDestPoints:
-            #p1 = Calling_Points(b.location_name,b.crs,b.st,b.et)
-            #self.calls_at.append(copy.copy(p1))
+        for b in arrDestPoints:
+            p1 = Calling_Points(b.location_name,b.crs,b.st,b.et)
+            p1s = json.dumps(vars(p1))
+            
+        self.calls_at.append(str(p1s))
 
-        #self.stops = len(self.calls_at)
+        self.stops = len(self.calls_at)
 
 class Calling_Points:
     def __init__(self, name, code, time, status):
@@ -97,14 +99,6 @@ class Handle_Data(asyncore.dispatcher_with_send):
 
             self.send(jsonObject.encode())
 
-        if data2: #If there is any data run a command.
-                if data2 == "REQUEST NAME":
-                    #Do things.
-                    self.send(stringbuilder.encode()) #Send the data with defualt encoding.
-
-                elif "OTHER REQUEST NAME" in data2:
-                    #Do something else.
-                    self.send(stringbuilder.encode()) #Send the data with defualt encoding.
         else:
             pass
 
