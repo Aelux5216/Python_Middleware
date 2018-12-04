@@ -119,7 +119,7 @@ class Server(asyncore.dispatcher):
             handler = Handle_Data(sock) #Pass to the data class
             print("listening..")
 
-server = Server('0.0.0.0', 8000) #Create new instance of server, 0.0.0.0 means it will host on any port so both 127.0.0.1(local pc only) and 192.168.1.1 will be hosted so it can be accessed from other pcs.
+server = Server('0.0.0.0', 8001) #Create new instance of server, 0.0.0.0 means it will host on any port so both 127.0.0.1(local pc only) and 192.168.1.1 will be hosted so it can be accessed from other pcs.
 print("listening..") #State that the server is listening again. 
 
 asyncore.loop() #Call loop method of asyncore to begin listening for clients again.
