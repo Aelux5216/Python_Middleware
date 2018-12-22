@@ -16,75 +16,6 @@ def initSession():
 class Service():
     pass
 
-def GetOne(service_no, dep_code, arr_code):
-    
-    session = None
-    service = None
-    error = ""
-
-    try:
-        session = initSession()
-
-    except:
-        error = "NoConn"
-
-    if session is not None:
-        
-        depBoardRequest = session.get_station_board(dep_code,destination_crs=arr_code)
-        
-        try:
-            service = depBoardRequest.train_services[service_no]
-
-        except:
-            error = "NoServices"
-            return error
-
-        if service is not None:
-            depServiceId = service.service_id
-            depServiceDet = session.get_service_details(depServiceId)
-            arrDestPoints = depServiceDet.subsequent_calling_points
-        
-            for e in arrDestPoints:
-                if arr_code in e.crs:
-                    arrDest = e
-                pass
-            
-            for a in depBoardRequest.train_services:
-                if depServiceId in a.service_id:
-                    arr_platform = a.platform
-                pass
-
-            Service1 = Service()
-
-            Service1.service_id = service.service_id
-            Service1.operator = service.operator_name
-            Service1.dep_name = service.origin_text
-            Service1.dep_code = depServiceDet.crs
-            Service1.dep_time = service.std
-            Service1.dep_platform = service.platform
-            Service1.arr_name = arrDest.location_name
-            Service1.arr_code = arr_code
-            Service1.arr_time = arrDest.st
-            Service1.arr_platform = arr_platform
-            Service1.status = service.etd
-            Service1.disrupt_reason = depServiceDet.disruption_reason 
-            Service1.calls_at = []
-
-            for b in arrDestPoints:
-                p1 = Calling_Points(b.location_name,b.crs,b.st,b.et)
-                p1s = json.dumps(vars(p1))
-            
-            Service1.calls_at.append(str(p1s))
-
-            Service1.stops = len(Service1.calls_at)
-
-            return Service1
-        
-        else:
-            return error
-    else:
-        return error
-
 def GetAll(dep_code, arr_code):
         
     session = None
@@ -177,31 +108,7 @@ class Handle_Data(asyncore.dispatcher_with_send):
 
         decodedData = rawData.decode('ascii') #Decode the data recieved from ascii(since it was sent from c# code it will be in ascii).
 
-        if "GetOne" in decodedData:
-
-            session = initSession()
-
-            splitData = decodedData.split("{")
-
-            serviceNo = int(splitData[1])
-            
-            depStation = splitData[2]
-
-            arrStation = splitData[3]
-
-            #Will use selected value service for service no, for now defaulting to first service index of 0
-            result = GetOne(serviceNo,depStation,arrStation)
-
-            if "NoServices" not in result and "NoConn" not in result:
-                
-                jsonObject = json.dumps(vars(result))
-                self.send(jsonObject.encode())
-
-            else:
-
-                self.send(result.encode())
-
-        elif "GetAll" in decodedData:
+        if "GetAll" in decodedData:
             
             session = initSession()
 
