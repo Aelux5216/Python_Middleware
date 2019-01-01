@@ -29,7 +29,7 @@ def GetAll(dep_code, arr_code):
 
     if session is not None:
 
-        depBoardRequest = session.get_station_board(dep_code,destination_crs=arr_code)
+        depBoardRequest = session.get_station_board(dep_code,destination_crs=arr_code,rows=150)
         
         services = depBoardRequest.train_services
         
