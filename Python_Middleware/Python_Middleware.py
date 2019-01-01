@@ -69,9 +69,8 @@ def GetAll(dep_code, arr_code):
                 for b in arrDestPoints:
                     p1 = Calling_Points(b.location_name,b.crs,b.st,b.et)
                     p1s = json.dumps(vars(p1))
-            
-                service1.calls_at.append(str(p1s))
-
+                    service1.calls_at.append(str(p1s))
+                    
                 service1.stops = len(service1.calls_at)
 
                 jsonObject = json.dumps(vars(service1))
