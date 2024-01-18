@@ -6,7 +6,7 @@ import copy
 import json
 from nredarwin.webservice import DarwinLdbSession
 
-#Connect to API
+#Connect to API 
 def initSession():
     newSession = DarwinLdbSession(wsdl="https://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2017-10-01", api_key="***REMOVED***")
     return newSession
